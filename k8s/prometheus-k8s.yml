@@ -35,3 +35,16 @@ scrape_configs:
     target_label:  service
     regex:         .*/([^/]+)
     replacement:   $1
+
+- job_name: 'linkerd-tcp'
+  metrics_path: /metrics
+
+  kubernetes_sd_configs:
+  - api_server: 'http://localhost:8001'
+    role: endpoints
+
+  relabel_configs:
+  # only collect from linkerd's
+  - source_labels: ['__meta_kubernetes_service_name']
+    regex:         (.*l5d-tcp$)
+    action:        keep
